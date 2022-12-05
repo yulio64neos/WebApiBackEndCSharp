@@ -95,12 +95,12 @@
     <Compile Include="Controllers\MaterialController.cs" />
     <Compile Include="Controllers\NotaController.cs" />
     <Compile Include="Controllers\ObraController.cs" />
+    <Compile Include="Controllers\ProveedoresController.cs" />
     <Compile Include="Data\ClassDetalleNDAL.cs" />
     <Compile Include="Data\ClassMaterialDAL.cs" />
     <Compile Include="Data\ClassNotaDAL.cs" />
     <Compile Include="Data\ClassObraDAL.cs" />
     <Compile Include="Data\ClassProveedorDAL.cs" />
-    <Compile Include="Data\Conexion.cs" />
     <Compile Include="Global.asax.cs">
       <DependentUpon>Global.asax</DependentUpon>
     </Compile>

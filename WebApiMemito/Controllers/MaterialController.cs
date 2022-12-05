@@ -16,19 +16,22 @@ namespace WebApiMemito.Controllers
         [HttpGet]
         public List<Material> Get()
         {
-            return obj.ListaMaterial();
+            string mensaje = "";
+            return obj.ListaMaterial(ref mensaje);
         }
 
         [HttpGet]
         public Material GetById(string x)
         {
-            return obj.Obtener(x);
+            string mensaje = "";
+            return obj.Obtener(x, ref mensaje);
         }
 
         [HttpPost]
         public bool Post([FromBody] Material mate)
         {
-            return obj.RegistrarMaterial(mate);
+            string mensaje = "";
+            return obj.RegistrarMaterial(mate, ref mensaje);
         }
     }
 }

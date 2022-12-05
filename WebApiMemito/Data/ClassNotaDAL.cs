@@ -11,10 +11,12 @@ namespace WebApiMemito.Data
 {
     public class ClassNotaDAL
     {
-        public List<Nota> ListaNota()
+        readonly private string CadConexion = ConfigurationManager.ConnectionStrings["Obra"].ConnectionString;
+
+        public List<Nota> ListaNota(ref string mensaje)
         {
             List<Nota> listNota = new List<Nota>();
-            using (SqlConnection con = new SqlConnection(Conexion.CadCon))
+            using (SqlConnection con = new SqlConnection(CadConexion))
             {
                 SqlCommand cmd = new SqlCommand("SELECT Nota.id_Nota, Nota.Fecha, Nota.Extra FROM Nota", con);
                 try
@@ -34,19 +36,21 @@ namespace WebApiMemito.Data
                             });
                         }
                     }
-                    return listNota;
+                    con.Close();
                 }
                 catch (Exception ex)
                 {
-                    return listNota;
+                    con.Close();
+                    mensaje = ex.Message;
                 }
             }
+            return listNota;
         }
 
-        public Nota Obtener(string id_Nota)
+        public Nota Obtener(string id_Nota, ref string mensaje)
         {
             Nota obj = new Nota();
-            using (SqlConnection con = new SqlConnection(Conexion.CadCon))
+            using (SqlConnection con = new SqlConnection(CadConexion))
             {
                 SqlCommand cmd = new SqlCommand("SELECT Nota.id_Nota, Nota.Fecha, Nota.Extra FROM Nota WHERE Nota.id_Nota = @ID", con);
                 cmd.Parameters.AddWithValue("@ID", id_Nota);
@@ -67,18 +71,98 @@ namespace WebApiMemito.Data
                             };
                         }
                     }
-                    return obj;
+                    con.Close();
                 }
                 catch (Exception ex)
                 {
-                    return obj;
+                    con.Close();
+                    mensaje = ex.Message;
                 }
             }
+           return obj;
         }
 
-        public bool RegistrarNota(Nota note)
+        public Nota NotaObra(string id_Obra, ref string mensaje)
         {
-            using (SqlConnection con = new SqlConnection(Conexion.CadCon))
+            Nota obj = new Nota();
+            using (SqlConnection con = new SqlConnection(CadConexion))
+            {
+                SqlCommand cmd = new SqlCommand(@"SELECT Nota.Extra, Nota.Fecha
+                FROM Detalle_Nota 
+                INNER JOIN Nota ON Detalle_Nota.Nota = Nota.id_Nota
+                INNER JOIN Obra ON Detalle_Nota.Obra = Obra.id_Obra
+                WHERE Obra.id_Obra = @ID", con);
+                cmd.Parameters.AddWithValue("@ID", id_Obra);
+
+                try
+                {
+                    con.Open();
+
+                    using (SqlDataReader dr = cmd.ExecuteReader())
+                    {
+                        while (dr.Read())
+                        {
+                            obj = new Nota()
+                            {
+                                Fecha = Convert.ToDateTime(dr["Fecha"].ToString()),
+                                Extra = dr["Extra"].ToString()
+                            };
+                        }
+                    }
+                    con.Close();
+                }
+                catch (Exception ex)
+                {
+                    con.Close();
+                    mensaje = ex.Message;
+                }
+            }
+            return obj;
+        }
+
+        public Nota NotaObraFecha(string id_Obra, string fecha_ini, string fecha_fin, ref string mensaje)
+        {
+            Nota obj = new Nota();
+            using (SqlConnection con = new SqlConnection(CadConexion))
+            {
+                SqlCommand cmd = new SqlCommand(@"SELECT Nota.Extra, Nota.Fecha
+                FROM Detalle_Nota 
+                INNER JOIN Nota ON Detalle_Nota.Nota = Nota.id_Nota
+                INNER JOIN Obra ON Detalle_Nota.Obra = Obra.id_Obra
+                WHERE Obra.id_Obra = @ID AND  Nota.Fecha >= @ini AND Nota.Fecha <= @fin", con);
+                cmd.Parameters.AddWithValue("@ID", id_Obra);
+                cmd.Parameters.AddWithValue("@ini", fecha_ini);
+                cmd.Parameters.AddWithValue("@fin", fecha_fin);
+
+                try
+                {
+                    con.Open();
+
+                    using (SqlDataReader dr = cmd.ExecuteReader())
+                    {
+                        while (dr.Read())
+                        {
+                            obj = new Nota()
+                            {
+                                Fecha = Convert.ToDateTime(dr["Fecha"].ToString()),
+                                Extra = dr["Extra"].ToString()
+                            };
+                        }
+                    }
+                    con.Close();
+                }
+                catch (Exception ex)
+                {
+                    con.Close();
+                    mensaje = ex.Message;
+                }
+            }
+            return obj;
+        }
+
+        public bool RegistrarNota(Nota note, ref string mensaje)
+        {
+            using (SqlConnection con = new SqlConnection(CadConexion))
             {
                 SqlCommand cmd = new SqlCommand("INSERT Nota VALUES(@Fecha, @Extra)", con);
                 cmd.Parameters.AddWithValue("@Fecha", note.Fecha);
@@ -92,6 +176,8 @@ namespace WebApiMemito.Data
                 }
                 catch (Exception ex)
                 {
+                    con.Close();
+                    mensaje = ex.Message;
                     return false;
                 }
             }

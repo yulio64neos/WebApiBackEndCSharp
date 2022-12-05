@@ -11,10 +11,12 @@ namespace WebApiMemito.Data
 {
     public class ClassDetalleNDAL
     {
-         public List<DetalleNota> ListaDetalleNota()
+        readonly private string CadConexion = ConfigurationManager.ConnectionStrings["Obra"].ConnectionString;
+
+        public List<DetalleNota> ListaDetalleNota(ref string mensaje)
          {
             List<DetalleNota> listNota = new List<DetalleNota>();
-            using (SqlConnection con = new SqlConnection(Conexion.CadCon))
+            using (SqlConnection con = new SqlConnection(CadConexion))
             {
                 SqlCommand cmd = new SqlCommand("SELECT Detalle_Nota.id_Detalle, Obra.Nombre_Obra, Proveedor.RazonSoc, Material.Nombre_Mat, Nota.Fecha, Detalle_Nota.Cantidad, Detalle_Nota.PrecioUnitario, Detalle_Nota.Extra "
                                                + "FROM Detalle_Nota inner join Obra on (Detalle_Nota.Obra = Obra.id_Obra) inner join Nota on (Detalle_Nota.Nota = Nota.id_Nota) "
@@ -53,19 +55,21 @@ namespace WebApiMemito.Data
                             });
                         }
                     }
-                    return listNota;
+                    con.Close();
                 }
                 catch (Exception ex)
                 {
-                    return listNota;
+                    con.Close();
+                    mensaje = ex.Message;
                 }
             }
+            return listNota;
         }
 
-        public DetalleNota Obtener(string id_DetalleNota)
+        public DetalleNota Obtener(string id_DetalleNota, ref string mensaje)
         {
             DetalleNota obj = new DetalleNota();
-            using (SqlConnection con = new SqlConnection(Conexion.CadCon))
+            using (SqlConnection con = new SqlConnection(CadConexion))
             {
                 SqlCommand cmd = new SqlCommand("SELECT Detalle_Nota.id_Detalle, Obra.Nombre_Obra, Proveedor.RazonSoc, Material.Nombre_Mat, Nota.Fecha, Detalle_Nota.Cantidad, Detalle_Nota.PrecioUnitario, Detalle_Nota.Extra " +
                                                 "FROM Detalle_Nota inner join Obra on (Detalle_Nota.Obra = Obra.id_Obra) inner join Nota on (Detalle_Nota.Nota = Nota.id_Nota) " +
@@ -106,18 +110,20 @@ namespace WebApiMemito.Data
                             };
                         }
                     }
-                    return obj;
+                    
                 }
                 catch(Exception ex)
                 {
-                    return obj;
+                    con.Close();
+                    mensaje = ex.Message;
                 }
             }
+            return obj;
         }
 
-        public bool RegistrarDetaNota(DetalleNotaPost note)
+        public bool RegistrarDetaNota(DetalleNotaPost note, ref string mensaje)
         {
-            using (SqlConnection con = new SqlConnection(Conexion.CadCon))
+            using (SqlConnection con = new SqlConnection(CadConexion))
             {
                 SqlCommand cmd = new SqlCommand("INSERT Detalle_Nota VALUES (@Obra, @Prove, @Material, @Nota, @Cant, @PrecioUn, @Extra)", con);
                 cmd.Parameters.AddWithValue("@Obra", note.Obra);
@@ -136,6 +142,8 @@ namespace WebApiMemito.Data
                 }
                 catch (Exception ex)
                 {
+                    con.Close();
+                    mensaje = ex.Message;
                     return false;
                 }
             }

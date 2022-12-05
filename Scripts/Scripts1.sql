@@ -166,3 +166,4 @@ BEGIN
 END
 
 EXEC CREAR_OBRA 'UTP', '20 de Noviembre', '2022-01-01', '2022-11-11', 'Julio Andrei', 'Mena de la rosa', '22225669899', 'prueba@live.com'
+

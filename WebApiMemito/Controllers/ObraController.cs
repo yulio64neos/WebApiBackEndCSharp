@@ -16,19 +16,22 @@ namespace WebApiMemito.Controllers
         [HttpGet]
         public List<Obra> Get()
         {
-            return obj.ListaObra();
+            string mensaje = "";
+            return obj.ListaObra(ref mensaje);
         }
 
         [HttpGet]
         public Obra GetById(string x)
         {
-            return obj.Obtener(x);
+            string mensaje = "";
+            return obj.Obtener(x, ref mensaje);
         }
 
         [HttpPost]
         public bool Post([FromBody] Obra obra)
         {
-            return obj.RegistrarObra(obra);
+            string mensaje = "";
+            return obj.RegistrarObra(obra, ref mensaje);
         }
     }
 }

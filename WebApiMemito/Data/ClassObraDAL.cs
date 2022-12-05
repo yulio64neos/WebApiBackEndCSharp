@@ -11,24 +11,24 @@ namespace WebApiMemito.Data
 {
     public class ClassObraDAL
     {
-        public List<Obra> ListaObra()
+        readonly private string CadConexion = ConfigurationManager.ConnectionStrings["Obra"].ConnectionString;
+
+        public List<Obra> ListaObra(ref string mensaje)
         {
             List<Obra> listObra = new List<Obra>();
-            using (SqlConnection con = new SqlConnection(Conexion.CadCon))
+            using (SqlConnection con = new SqlConnection(CadConexion))
             {
                 SqlCommand cmd = new SqlCommand("SELECT Obra.id_Obra, Obra.Nombre_Obra, Obra.Direccion, Obra.Fecha_ini, Obra.fecha_fin, Obra.Dueño, Obra.Responsable, Obra.Tel_resp, Obra.Correo_res FROM OBRA", con);
                 try
                 {
                     con.Open();
-                    //cmd.ExecuteNonQuery();
-
                     using (SqlDataReader dr = cmd.ExecuteReader())
                     {
                         while (dr.Read())
                         {
                             listObra.Add(new Obra
                             {
-                                id_Obra = Convert.ToInt32(dr["id_Obra"]),
+                                id_Obra = Convert.ToInt32(dr[0]),
                                 Nombre_Obra = dr["Nombre_Obra"].ToString(),
                                 Direccion = dr["Direccion"].ToString(),
                                 Fecha_ini = Convert.ToDateTime(dr["Fecha_ini"].ToString()),
@@ -36,23 +36,25 @@ namespace WebApiMemito.Data
                                 Dueño = dr["Dueño"].ToString(),
                                 Responsable = dr["Responsable"].ToString(),
                                 Tel_resp = dr["Tel_resp"].ToString(),
-                                Correo_resp = dr["Correo_resp"].ToString()
+                                Correo_resp = dr["Correo_res"].ToString()
                             });
                         }
+                        con.Close();
                     }
-                    return listObra;
                 }
                 catch (Exception ex)
                 {
-                    return listObra;
+                    con.Close();
+                    mensaje = ex.Message;
                 }
             }
+            return listObra;
         }
 
-        public Obra Obtener(string id_Obra)
+        public Obra Obtener(string id_Obra, ref string mensaje)
         {
             Obra obj = new Obra();
-            using (SqlConnection con = new SqlConnection(Conexion.CadCon))
+            using (SqlConnection con = new SqlConnection(CadConexion))
             {
                 SqlCommand cmd = new SqlCommand("SELECT Obra.id_Obra, Obra.Nombre_Obra, Obra.Direccion, Obra.Fecha_ini, Obra.fecha_fin, Obra.Dueño, Obra.Responsable, Obra.Tel_resp, Obra.Correo_res FROM OBRA " +
                                                 "WHERE Obra.id_Obra = @ID", con);
@@ -80,18 +82,21 @@ namespace WebApiMemito.Data
                             };
                         }
                     }
-                    return obj;
+
+                    con.Close();
                 }
                 catch (Exception ex)
                 {
-                    return obj;
+                    con.Close();
+                    mensaje = ex.Message;
                 }
             }
+            return obj;
         }
 
-        public bool RegistrarObra(Obra obra)
+        public bool RegistrarObra(Obra obra, ref string mensaje)
         {
-            using (SqlConnection con = new SqlConnection(Conexion.CadCon))
+            using (SqlConnection con = new SqlConnection(CadConexion))
             {
                 SqlCommand cmd = new SqlCommand("INSERT Obra VALUES (@Nombre_Obra, @Direccion, @Fecha_ini, @fecha_fin, @Dueño, @Responsable, @Tel_resp, @Correo_res)", con);
                 cmd.Parameters.AddWithValue("@Nombre_Obra", obra.Nombre_Obra);
@@ -111,6 +116,8 @@ namespace WebApiMemito.Data
                 }
                 catch (Exception ex)
                 {
+                    con.Close();
+                    mensaje = ex.Message;
                     return false;
                 }
             }
