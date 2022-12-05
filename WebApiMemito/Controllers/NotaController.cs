@@ -28,14 +28,14 @@ namespace WebApiMemito.Controllers
         }
 
         [HttpGet]
-        public Nota GetNotaObra(string x)
+        public List<Nota> GetNotaObra(string x)
         {
             string mensaje = "";
             return obj.NotaObra(x, ref mensaje);
         }
 
         [HttpGet]
-        public Nota GetFecha(string x, string x2, string x3)
+        public List<Nota> GetFecha(string x, string x2, string x3)
         {
             string mensaje = "";
             return obj.NotaObraFecha(x, x2, x3, ref mensaje);

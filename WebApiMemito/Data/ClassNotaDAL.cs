@@ -82,9 +82,9 @@ namespace WebApiMemito.Data
            return obj;
         }
 
-        public Nota NotaObra(string id_Obra, ref string mensaje)
+        public List<Nota> NotaObra(string id_Obra, ref string mensaje)
         {
-            Nota obj = new Nota();
+            List<Nota> obj = new List<Nota>();
             using (SqlConnection con = new SqlConnection(CadConexion))
             {
                 SqlCommand cmd = new SqlCommand(@"SELECT Nota.Extra, Nota.Fecha
@@ -102,11 +102,11 @@ namespace WebApiMemito.Data
                     {
                         while (dr.Read())
                         {
-                            obj = new Nota()
+                            obj.Add(new Nota
                             {
                                 Fecha = Convert.ToDateTime(dr["Fecha"].ToString()),
                                 Extra = dr["Extra"].ToString()
-                            };
+                            });
                         }
                     }
                     con.Close();
@@ -120,9 +120,9 @@ namespace WebApiMemito.Data
             return obj;
         }
 
-        public Nota NotaObraFecha(string id_Obra, string fecha_ini, string fecha_fin, ref string mensaje)
+        public List<Nota> NotaObraFecha(string id_Obra, string fecha_ini, string fecha_fin, ref string mensaje)
         {
-            Nota obj = new Nota();
+            List<Nota> obj = new List<Nota>();
             using (SqlConnection con = new SqlConnection(CadConexion))
             {
                 SqlCommand cmd = new SqlCommand(@"SELECT Nota.Extra, Nota.Fecha
@@ -142,11 +142,11 @@ namespace WebApiMemito.Data
                     {
                         while (dr.Read())
                         {
-                            obj = new Nota()
+                            obj.Add(new Nota
                             {
                                 Fecha = Convert.ToDateTime(dr["Fecha"].ToString()),
                                 Extra = dr["Extra"].ToString()
-                            };
+                            });
                         }
                     }
                     con.Close();
